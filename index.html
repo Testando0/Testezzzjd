@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✰ KUROMI TV ✰</title>
+    <style>
+        :root {
+            --background-color: #3f0000; /* Vermelho escuro */
+            --surface-color: #5a0000;    /* Vermelho um pouco mais claro para as categorias */
+            --primary-text-color: #ffffff; /* Texto principal branco */
+            --secondary-text-color: #e0e0e0; /* Texto secundário levemente acinzentado */
+            --accent-color: #ff3333;     /* Vermelho vibrante para destaque */
+            --border-color: #8b0000;     /* Vermelho escuro para bordas */
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--background-color);
+            color: var(--primary-text-color);
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2.8em;
+            color: var(--accent-color);
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        #user-session {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            z-index: 100; 
+        }
+        
+        /* ESTILO PARA O ÍCONE/MENU */
+        #settings-icon {
+            cursor: pointer;
+            font-size: 24px;
+            line-height: 1;
+            padding: 5px;
+            transition: color 0.3s;
+        }
+        #settings-icon:hover {
+            color: var(--accent-color);
+        }
+
+        #account-menu {
+            position: absolute;
+            top: 100%; /* Posiciona abaixo do ícone */
+            right: 0;
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            overflow: hidden;
+            width: 180px; 
+            margin-top: 10px;
+        }
+
+        #account-menu button {
+            display: block;
+            width: 100%;
+            padding: 10px 15px;
+            text-align: left;
+            background: none;
+            border: none;
+            color: var(--primary-text-color);
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-weight: 500;
+            font-size: 0.95em;
+        }
+
+        #account-menu button:hover {
+            background-color: #8B0000;
+        }
+        
+        /* Classe para o botão de SAIR, mantendo-a específica para logout */
+        .logout-button {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        .logout-button:hover {
+            background-color: #cc0000;
+        }
+        /* FIM DOS ESTILOS DE MENU */
+
+        #current-channel {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 1.3em;
+            color: var(--secondary-text-color);
+            font-weight: 500;
+        }
+        .player-container {
+            width: 100%;
+            position: relative;
+            padding-top: 56.25%;
+            background-color: #000;
+            margin-top: 20px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 3px solid var(--border-color);
+            box-shadow: 0 0 15px rgba(0,0,0,0.5);
+        }
+        .player-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .channel-grid-container {
+            margin-top: 30px;
+        }
+        .channel-category {
+            background-color: var(--surface-color);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+        }
+        .channel-category h2 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 10px;
+            display: inline-block;
+        }
+        .channel-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .channel-button {
+            background-color: #8B0000;
+            color: #fff;
+            border: 1px solid #B22222;
+            padding: 12px 18px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 1em;
+            font-weight: 500;
+            transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
+        }
+        .channel-button:hover {
+            background-color: #B22222;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 30px;
+            width: 100%;
+            font-size: 0.9em;
+            color: var(--secondary-text-color);
+            border-top: 1px solid var(--border-color);
+        }
+        #auth-container, #recharge-container, #redeem-code-modal {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 30px;
+            background-color: var(--surface-color);
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            border: 1px solid var(--border-color);
+        }
+        /* Estilo do modal de Resgate */
+        #redeem-code-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 200;
+            max-width: 450px;
+            width: 90%;
+            margin: 0; 
+        }
+        /* Overlay para o modal */
+        #modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 150;
+        }
+
+        .form-container h2 {
+            text-align: center;
+            color: var(--accent-color);
+            margin-bottom: 25px;
+        }
+        .form-container .form-group {
+            margin-bottom: 15px;
+        }
+        .form-container label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        .form-container input {
+            width: 100%;
+            padding: 10px;
+            background-color: var(--background-color);
+            border: 1px solid var(--border-color);
+            color: var(--primary-text-color);
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        .form-container button[type="submit"] {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--accent-color);
+            border: none;
+            color: white;
+            font-size: 1.1em;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .form-container button[type="submit"]:hover {
+            background-color: #cc0000;
+        }
+        .toggle-form {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .toggle-form a {
+            color: var(--accent-color);
+            text-decoration: underline;
+            cursor: pointer;
+        }
+        .message {
+            text-align: center;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+        #recharge-container p {
+            text-align: center;
+            line-height: 1.5;
+        }
+        .hidden {
+            display: none;
+        }
+        
+        /* Estilo para o botão que deve APENAS fechar o modal */
+        .modal-close-button {
+            width: 100%; 
+            padding: 12px; 
+            font-weight: bold; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            transition: background-color 0.3s; 
+            background-color: var(--surface-color); 
+            border: 1px solid var(--border-color); 
+            color: var(--primary-text-color); 
+            margin-top: 15px;
+        }
+        .modal-close-button:hover {
+            background-color: #4a0000;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="auth-container" class="hidden">
+        <div id="login-form-container" class="form-container">
+            <form id="login-form">
+                <h2>Login</h2>
+                <div class="form-group"><label for="login-username">Usuário</label><input type="text" id="login-username" required></div>
+                <div class="form-group"><label for="login-password">Senha</label><input type="password" id="login-password" required></div>
+                <button type="submit">Entrar</button>
+                <p id="login-message" class="message"></p>
+            </form>
+            <p class="toggle-form">Não tem uma conta? <a id="show-register">Registre-se</a></p>
+        </div>
+        
+        <div id="register-form-container" class="form-container hidden">
+            <form id="register-form">
+                <h2>Registro</h2>
+                <div class="form-group"><label for="register-username">Usuário</label><input type="text" id="register-username" required></div>
+                <div class="form-group"><label for="register-password">Senha</label><input type="password" id="register-password" required></div>
+                <button type="submit">Criar Conta</button>
+                <p id="register-message" class="message"></p>
+            </form>
+            <p class="toggle-form">Já tem uma conta? <a id="show-login">Faça Login</a></p>
+        </div>
+    </div>
+
+    <div id="recharge-container" class="hidden">
+        <div class="form-container">
+             <h2>Acesso Expirado</h2>
+             <p>Sua assinatura terminou ou nunca foi ativada. Insira um código de recarga para continuar.</p>
+             <form id="recharge-form">
+                  <div class="form-group">
+                       <label for="recharge-code">Código de Recarga</label>
+                       <input type="text" id="recharge-code" required>
+                  </div>
+                  <button type="submit">Ativar</button>
+                  <p id="recharge-message" class="message"></p>
+             </form>
+             <button id="recharge-logout-button" class="logout-button" style="width: 100%; margin-top: 15px;">Sair</button>
+        </div>
+    </div>
+
+    <div id="main-content" class="container hidden">
+        <header>
+            <h1>✰ KUROMI TV ✰</h1>
+            <div id="user-session" class="hidden">
+                 <span id="welcome-message"></span>
+                 
+                 <span id="settings-icon">⚙️</span>
+                 <div id="account-menu" class="hidden">
+                     <button id="menu-redeem-code">Resgatar Código</button>
+                     <button id="menu-logout">Sair</button>
+                     <button id="menu-delete-account" style="color: var(--accent-color);">Deletar Conta</button>
+                 </div>
+                 </div>
+        </header>
+
+        <main>
+             <div id="redeem-code-modal" class="hidden">
+                 <div class="form-container">
+                      <h2>Resgatar Código</h2>
+                      <p style="text-align: center; font-size: 0.9em; color: var(--secondary-text-color);">Adicione mais dias à sua assinatura.</p>
+                      <form id="redeem-form">
+                           <div class="form-group">
+                                <label for="redeem-code">Código de Recarga</label>
+                                <input type="text" id="redeem-code" required>
+                           </div>
+                           <button type="submit">Resgatar</button>
+                           <p id="redeem-message" class="message"></p>
+                      </form>
+                      <button id="close-redeem-modal" class="modal-close-button">Fechar</button>
+                 </div>
+             </div>
+             <div id="modal-overlay" class="hidden"></div>
+
+             <div class="player-container">
+                 <iframe id="tv-player" 
+                         src="https://playertv.net/e/?v=nickAlt&autoplay=1&mute=0" 
+                         allow="autoplay; encrypted-media; fullscreen" 
+                         allowfullscreen>
+                 </iframe>
+             </div>
+             <p id="current-channel">Escolha Um Canal Abaixo</p>
+
+             <div class="channel-grid-container">
+                 
+                 <div class="channel-category">
+                     <h2>A Fazenda</h2>
+                     <div class="channel-buttons">
+                         <button class="channel-button" data-channel="sinal1" data-name="Câmera 1">Câmera 1</button>
+                         <button class="channel-button" data-channel="sinal2" data-name="Câmera 2">Câmera 2</button>
+                         <button class="channel-button" data-channel="sinal3" data-name="Câmera 3">Câmera 3</button>
+                         <button class="channel-button" data-channel="sinal4" data-name="Câmera 4">Câmera 4</button>
+                         <button class="channel-button" data-channel="sinal5" data-name="Câmera 5">Câmera 5</button>
+                         <button class="channel-button" data-channel="sinal6" data-name="Câmera 6">Câmera 6</button>
+                     </div>
+                 </div>
+
+                 <div class="channel-category">
+                     <h2>Canais Abertos</h2>
+                     <div class="channel-buttons">
+                         <button class="channel-button" data-channel="globoPRalt" data-name="Globo">Globo</button>
+                         <button class="channel-button" data-channel="globoMSalt" data-name="Globo">Globo-2</button>
+                         <button class="channel-button" data-channel="globoPAalt" data-name="Globo">Globo-3</button>
+                         <button class="channel-button" data-channel="sbt" data-name="SBT">SBT</button>
+                         <button class="channel-button" data-channel="sbtA" data-name="SBT">SBT-2</button>
+                         <button class="channel-button" data-channel="sbtAlt2" data-name="SBT">SBT-3</button>
+                         <button class="channel-button" data-channel="recordGO" data-name="Record TV">Record</button>
+                         <button class="channel-button" data-channel="recordPA" data-name="Record TV">Record-2</button>
+                         <button class="channel-button" data-channel="recordDF" data-name="Record TV">Record-3</button>
+                         <button class="channel-button" data-channel="recordBA" data-name="Record TV">Record-4</button>
+                         <button class="channel-button" data-channel="recordMG" data-name="Record TV">Record-5</button>
+                         <button class="channel-button" data-channel="recordRJ" data-name="Record TV">Record-6</button>
+                         <button class="channel-button" data-channel="recordSP" data-name="Record TV">Record-7</button>
+                         <button class="channel-button" data-channel="bandAlt" data-name="Band">Band</button>
+                     </div>
+                 </div>
+
+                 <div class="channel-category">
+                     <h2>Notícias</h2>
+                     <div class="channel-buttons">
+                         <button class="channel-button" data-channel="globonews" data-name="GloboNews">GloboNews</button>
+                         <button class="channel-button" data-channel="bandNewsAlt" data-name="BandNews">BandNews</button>
+                         <button class="channel-button" data-channel="cnn" data-name="CNN">CNN</button>
+                         <button class="channel-button" data-channel="agro" data-name="Agro">Agro</button>
+                     </div>
+                 </div>
+
+                 <div class="channel-category">
+                     <h2>Esportes</h2>
+                     <div class="channel-buttons">
+                         <button class="channel-button" data-channel="sportv" data-name="SporTV">SporTV</button>
+                         <button class="channel-button" data-channel="sportv3Alt2" data-name="SporTv">SporTv-2</button>
+                         <button class="channel-button" data-channel="sportv3" data-name="SporTv">SporTv-3</button>
+                         <button class="channel-button" data-channel="sportv2Alt3" data-name="SporTv">SporTv-4</button>
+                         <button class="channel-button" data-channel="sportv2Alt2" data-name="SporTv">SporTv-5</button>
+                         <button class="channel-button" data-channel="sportv2" data-name="SporTv">SporTv-6</button>
+                         <button class="channel-button" data-channel="sportvAlt3" data-name="SporTv">SporTv-7</button>
+                         <button class="channel-button" data-channel="sportvAlt2" data-name="SporTv">SporTv-8</button>
+                         <button class="channel-button" data-channel="espn" data-name="ESPN">ESPN</button>
+                         <button class="channel-button" data-channel="espn6Alt" data-name="ESPN">ESPN-2</button>
+                         <button class="channel-button" data-channel="espn6" data-name="ESPN">ESPN-3</button>
+                         <button class="channel-button" data-channel="espn5Alt" data-name="ESPN">ESPN-4</button>
+                         <button class="channel-button" data-channel="espn5" data-name="ESPN">ESPN-5</button>
+                         <button class="channel-button" data-channel="espn6" data-name="ESPN">ESPN-6</button>
+                         <button class="channel-button" data-channel="premiere" data-name="Premiere Clubes">Premiere Clubes</button>
+                         <button class="channel-button" data-channel="Premiere8Alt2" data-name="Premiere">Premiere-2</button>
+                         <button class="channel-button" data-channel="premiere5" data-name="Premiere">Premiere-3</button>
+                         <button class="channel-button" data-channel="combateAlt" data-name="Combate">Combate</button>
+                         <button class="channel-button" data-channel="caze1" data-name="Cazé TV">Cazé TV</button>
+                         <button class="channel-button" data-channel="caze2" data-name="Cazé TV">Cazé TV-2</button>            
+                         <button class="channel-button" data-channel="bandSportsAlt" data-name="Band Sports">Band Sports</button>
+                     </div>
+                 </div>
+
+                 <div class="channel-category">
+                     <h2>Filmes e Séries</h2>
+                     <div class="channel-buttons">
+                         <button class="channel-button" data-channel="tcTouch" data-name="Telecine">Telecine</button>
+                         <button class="channel-button" data-channel="tcPremium" data-name="Telecine">Telecine-2</button>
+                         <button class="channel-button" data-channel="tcPipoca" data-name="Telecine">Telecine-3</button>
+                         <button class="channel-button" data-channel="tcAction" data-name="Telecine">Telecine-4</button>
+                         <button class="channel-button" data-channel="universalAlt" data-name="Universal">Universal</button>
+                         <button class="channel-button" data-channel="usaAlt" data-name="USA">USA</button>
+                         <button class="channel-button" data-channel="studioAlt" data-name="Studio Universal">Studio</button>
+                         <button class="channel-button" data-channel="megapix" data-name="Megapix">Megapix</button>
+                         <button class="channel-button" data-channel="megapixAlt" data-name="Megapix">Megapix-2</button>
+                         <button class="channel-button" data-channel="amc" data-name="AMC">AMC</button>
+                         <button class="channel-button" data-channel="paramountAlt" data-name="Paramount">Paramount</button>
+                         <button class="channel-button" data-channel="canalBrasil" data-name="Canal Brasil">Canal Br</button>
+                         <button class="channel-button" data-channel="universalPremiere" data-name="Universal Premiere">Universal Prem</button>
+                     </div>
+                 </div>
+
+                 <div class="channel-category">
+                     <h2>Infantil</h2>
+                     <div class="channel-buttons">
+                         <button class="channel-button" data-channel="gloob" data-name="Gloob">Gloob</button>
+                         <button class="channel-button" data-channel="gloobinho" data-name="Gloobinho">Gloobinho</button>
+                         <button class="channel-button" data-channel="nickAlt" data-name="Nickelodeon">Nickelodeon</button>
+                         <button class="channel-button" data-channel="tcFun" data-name="Telecine">Tc Fun</button>
+                         <button class="channel-button" data-channel="nickjrAlt" data-name="Nick Jr.">Nick Jr.</button>
+                         <button class="channel-button" data-channel="raTimBum" data-name="Rá Tim Bum">ESPN-3</button>
+                     </div>
+                 </div>
+
+                 <div class="channel-category">
+                     <h2>Documentários e Cultura</h2>
+                     <div class="channel-buttons">
+                         <button class="channel-button" data-channel="cultura" data-name="Cultura">Cultura</button>
+                         <button class="channel-button" data-channel="arte1Alt" data-name="Arte 1">Arte 1</button>
+                         <button class="channel-button" data-channel="tcCult" data-name="Telecine Cultura">Tc Cult</button>
+                         <button class="channel-button" data-channel="modoViagem" data-name="Modo Viagem">Modo Viagem</button>
+                         <button class="channel-button" data-channel="universalReality" data-name="ESPN">ESPN-3</button>
+                     </div>
+                 </div>
+
+                 <div class="channel-category">
+                     <h2>Variedades e Música</h2>
+                     <div class="channel-buttons">
+                         <button class="channel-button" data-channel="bis" data-name="Canal BIS">BIS</button>
+                         <button class="channel-button" data-channel="mtvLiveAlt" data-name="MTV">MTV</button>
+                     </div>
+                 </div>
+             </div>
+        </main>
+        <footer><p>&copy; Serviços Ainda Em Desenvolvimento Podendo Apresentar Falhas.</p></footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            // --- CONSTANTES E ELEMENTOS DO DOM ---
+            const mainContent = document.getElementById('main-content');
+            const authContainer = document.getElementById('auth-container');
+            const rechargeContainer = document.getElementById('recharge-container');
+            
+            // Formulários
+            const loginForm = document.getElementById('login-form');
+            const registerForm = document.getElementById('register-form');
+            const rechargeForm = document.getElementById('recharge-form');
+            const redeemForm = document.getElementById('redeem-form'); 
+            
+            // Links e Botões
+            const showRegisterLink = document.getElementById('show-register');
+            const showLoginLink = document.getElementById('show-login');
+            
+            // Botões de Ação
+            const rechargeLogoutButton = document.getElementById('recharge-logout-button'); 
+            const settingsIcon = document.getElementById('settings-icon');
+            const accountMenu = document.getElementById('account-menu');
+            const menuLogoutButton = document.getElementById('menu-logout');
+            const menuDeleteButton = document.getElementById('menu-delete-account');
+            const menuRedeemCodeButton = document.getElementById('menu-redeem-code'); 
+            const closeRedeemModalButton = document.getElementById('close-redeem-modal'); 
+            
+            // Modals/Containers Extras
+            const redeemCodeModal = document.getElementById('redeem-code-modal'); 
+            const modalOverlay = document.getElementById('modal-overlay'); 
+
+            // Mensagens
+            const loginMessage = document.getElementById('login-message');
+            const registerMessage = document.getElementById('register-message');
+            const rechargeMessage = document.getElementById('recharge-message');
+            const redeemMessage = document.getElementById('redeem-message'); 
+
+            // Sessão do Usuário
+            const userSession = document.getElementById('user-session');
+            const welcomeMessage = document.getElementById('welcome-message');
+
+            // Player de TV
+            const player = document.getElementById('tv-player');
+            const currentChannelDisplay = document.getElementById('current-channel');
+            const channelButtons = document.querySelectorAll('.channel-button');
+
+            // --- CÓDIGOS DE RECARGA ---
+            let rechargeData = { VALID_CODES: {}, MS_PER_DAY: 0 }; 
+            
+            const loadRechargeCodes = async () => {
+                try {
+                    const response = await fetch('codes.json');
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    const data = await response.json();
+                    return { 
+                        VALID_CODES: data.VALID_CODES || {},
+                        MS_PER_DAY: data.MS_PER_DAY || 0 
+                    };
+                } catch (error) {
+                    console.error('Falha ao carregar códigos de recarga:', error);
+                    rechargeMessage.textContent = 'Erro ao carregar dados de recarga. Tente novamente mais tarde.';
+                    rechargeMessage.style.color = 'var(--accent-color)';
+                    return { VALID_CODES: {}, MS_PER_DAY: 0 };
+                }
+            };
+
+            rechargeData = await loadRechargeCodes();
+
+            // --- FUNÇÕES DE CONTROLE DE TELA E SESSÃO ---
+            
+            const showScreen = (screenName) => {
+                mainContent.classList.add('hidden');
+                authContainer.classList.add('hidden');
+                rechargeContainer.classList.add('hidden');
+                accountMenu.classList.add('hidden'); 
+                redeemCodeModal.classList.add('hidden'); 
+                modalOverlay.classList.add('hidden'); 
+
+                if (screenName === 'auth') document.getElementById('auth-container').classList.remove('hidden');
+                else if (screenName === 'recharge') document.getElementById('recharge-container').classList.remove('hidden');
+                else if (screenName === 'main') document.getElementById('main-content').classList.remove('hidden');
+            };
+
+            const logoutSession = () => {
+                localStorage.removeItem('kuromi_tv_currentUser');
+                if(refreshInterval) clearInterval(refreshInterval);
+                loginForm.reset();
+                loginMessage.textContent = '';
+                showScreen('auth');
+            };
+
+            const deleteAccount = () => {
+                const currentUser = localStorage.getItem('kuromi_tv_currentUser');
+                if (confirm(`Tem certeza que deseja DELETAR a conta "${currentUser}"? Esta ação é irreversível.`)) {
+                    const users = JSON.parse(localStorage.getItem('kuromi_tv_users')) || {};
+                    delete users[currentUser];
+                    localStorage.setItem('kuromi_tv_users', JSON.stringify(users));
+                    alert("Conta deletada com sucesso.");
+                    logoutSession();
+                }
+            };
+
+            const checkSession = () => {
+                const currentUser = localStorage.getItem('kuromi_tv_currentUser');
+                if (!currentUser) {
+                    showScreen('auth');
+                    return;
+                }
+                
+                const users = JSON.parse(localStorage.getItem('kuromi_tv_users')) || {};
+                const userData = users[currentUser];
+
+                if (userData && userData.accessExpires && userData.accessExpires > Date.now()) {
+                    welcomeMessage.textContent = `Olá, ${currentUser}!`;
+                    userSession.classList.remove('hidden');
+                    showScreen('main');
+                    startRefreshTimer();
+                } else {
+                    showScreen('recharge');
+                }
+            };
+            
+            /**
+             * Função para processar a ativação de um código.
+             */
+            const processRechargeCode = (code, currentUser, messageElement, isRechargeScreen = false) => {
+                const users = JSON.parse(localStorage.getItem('kuromi_tv_users'));
+                const userData = users[currentUser];
+
+                const validCodes = rechargeData.VALID_CODES;
+                const MS_PER_DAY = rechargeData.MS_PER_DAY; 
+
+                if (!validCodes[code]) {
+                    messageElement.textContent = 'Código de recarga inválido!';
+                    messageElement.style.color = 'var(--accent-color)';
+                    return; 
+                }
+                if (userData.usedCodes && userData.usedCodes.includes(code)) {
+                    messageElement.textContent = 'Este código já foi utilizado por você!';
+                    messageElement.style.color = 'var(--accent-color)';
+                    return; 
+                }
+
+                const durationInDays = validCodes[code]; 
+                const durationInMs = durationInDays * MS_PER_DAY; 
+                
+                const startTime = (userData.accessExpires && userData.accessExpires > Date.now()) 
+                                ? userData.accessExpires 
+                                : Date.now();
+                
+                userData.accessExpires = startTime + durationInMs;
+                
+                if (!userData.usedCodes) { 
+                    userData.usedCodes = [];
+                }
+                userData.usedCodes.push(code);
+
+                localStorage.setItem('kuromi_tv_users', JSON.stringify(users));
+
+                messageElement.textContent = `Código ativado! Adicionado ${durationInDays} dia(s) de acesso.`;
+                messageElement.style.color = 'lightgreen';
+                
+                if (isRechargeScreen) {
+                    setTimeout(() => checkSession(), 1500);
+                } else {
+                    setTimeout(() => {
+                        redeemCodeModal.classList.add('hidden');
+                        modalOverlay.classList.add('hidden');
+                        redeemForm.reset();
+                        redeemMessage.textContent = '';
+                    }, 2000);
+                }
+            };
+            
+            // --- EVENT LISTENERS DE AUTENTICAÇÃO E RECARGA ---
+
+            registerForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const username = document.getElementById('register-username').value;
+                const password = document.getElementById('register-password').value;
+                const users = JSON.parse(localStorage.getItem('kuromi_tv_users')) || {};
+
+                if (users[username]) {
+                    registerMessage.textContent = 'Este usuário já existe!';
+                    registerMessage.style.color = 'var(--accent-color)';
+                } else {
+                    users[username] = { 
+                        password: password, 
+                        accessExpires: null,
+                        usedCodes: [] 
+                    };
+                    localStorage.setItem('kuromi_tv_users', JSON.stringify(users));
+                    
+                    registerMessage.textContent = 'Conta criada! Faça o login.';
+                    registerMessage.style.color = 'lightgreen';
+                    setTimeout(() => showLoginLink.click(), 2000);
+                }
+            });
+
+            loginForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const username = document.getElementById('login-username').value;
+                const password = document.getElementById('login-password').value;
+                const users = JSON.parse(localStorage.getItem('kuromi_tv_users')) || {};
+                const userData = users[username];
+
+                if (userData && userData.password === password) {
+                    localStorage.setItem('kuromi_tv_currentUser', username);
+                    checkSession();
+                } else {
+                    loginMessage.textContent = 'Usuário ou senha incorretos!';
+                }
+            });
+
+            // ATRIBUINDO LOGOUT ESPECIFICAMENTE PARA CADA BOTÃO DE SAIR
+            rechargeLogoutButton.addEventListener('click', logoutSession);
+            menuLogoutButton.addEventListener('click', logoutSession);
+            
+            // Eventos do Menu de Configuração
+            settingsIcon.addEventListener('click', (e) => {
+                e.stopPropagation(); 
+                accountMenu.classList.toggle('hidden');
+            });
+
+            menuDeleteButton.addEventListener('click', deleteAccount);
+            
+            // Exibir o modal de resgate
+            menuRedeemCodeButton.addEventListener('click', () => {
+                accountMenu.classList.add('hidden'); 
+                redeemCodeModal.classList.remove('hidden');
+                modalOverlay.classList.remove('hidden');
+                redeemForm.reset();
+                redeemMessage.textContent = '';
+            });
+
+            // O botão de fechar APENAS FECHA o modal
+            closeRedeemModalButton.addEventListener('click', () => {
+                redeemCodeModal.classList.add('hidden');
+                modalOverlay.classList.add('hidden');
+            });
+
+            // Fecha o menu/modal se o usuário clicar fora deles (no documento)
+            document.addEventListener('click', (e) => {
+                if (!accountMenu.classList.contains('hidden') && !e.target.closest('#user-session')) {
+                    accountMenu.classList.add('hidden');
+                }
+                if (!redeemCodeModal.classList.contains('hidden') && e.target.id === 'modal-overlay') {
+                    redeemCodeModal.classList.add('hidden');
+                    modalOverlay.classList.add('hidden');
+                }
+            });
+
+
+            rechargeForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const code = document.getElementById('recharge-code').value.toUpperCase();
+                const currentUser = localStorage.getItem('kuromi_tv_currentUser');
+                
+                processRechargeCode(code, currentUser, rechargeMessage, true);
+            });
+            
+            // Listener para o formulário de Resgatar Código (dentro do Main Content)
+            redeemForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const code = document.getElementById('redeem-code').value.toUpperCase();
+                const currentUser = localStorage.getItem('kuromi_tv_currentUser');
+                
+                processRechargeCode(code, currentUser, redeemMessage, false);
+            });
+
+
+            showRegisterLink.addEventListener('click', () => {
+                document.getElementById('login-form-container').classList.add('hidden');
+                document.getElementById('register-form-container').classList.remove('hidden');
+            });
+            showLoginLink.addEventListener('click', () => {
+                document.getElementById('register-form-container').classList.add('hidden');
+                document.getElementById('login-form-container').classList.remove('hidden');
+            });
+
+            // --- LÓGICA DO PLAYER ---
+            const playerContainer = document.querySelector('.player-container');
+
+            const openFullscreen = (elem) => {
+                if (elem.requestFullscreen) {
+                    elem.requestFullscreen();
+                } else if (elem.webkitRequestFullscreen) { /* Safari */
+                    elem.webkitRequestFullscreen();
+                } else if (elem.msRequestFullscreen) { /* IE11 */
+                    elem.msRequestFullscreen();
+                }
+            };
+            
+            let refreshInterval;
+            const REFRESH_INTERVAL_MS = 10 * 60 * 1000; // 10 minutos
+
+            const refreshPlayer = () => {
+                console.log(`Atualizando o player (${new Date().toLocaleTimeString()}) para manter a conexão estável.`);
+                
+                const currentUser = localStorage.getItem('kuromi_tv_currentUser');
+                const users = JSON.parse(localStorage.getItem('kuromi_tv_users')) || {};
+                const userData = users[currentUser];
+                
+                if (userData && userData.accessExpires && userData.accessExpires > Date.now()) {
+                    player.src = player.src; // Recarrega o iFrame
+                } else {
+                    clearInterval(refreshInterval);
+                    checkSession(); // Redireciona se o acesso expirou
+                }
+            };
+
+            const startRefreshTimer = () => {
+                if (refreshInterval) {
+                    clearInterval(refreshInterval);
+                }
+                refreshInterval = setInterval(refreshPlayer, REFRESH_INTERVAL_MS);
+            };
+
+            channelButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const channelId = button.getAttribute('data-channel');
+                    const channelName = button.getAttribute('data-name');
+                    
+                    // CORREÇÃO APLICADA AQUI: Adicionado &autoplay=1 no src.
+                    player.src = `https://playertv.net/e/?v=${channelId}&autoplay=1&mute=0`;
+                    currentChannelDisplay.textContent = `Canal Atual: ${channelName}`;
+                    
+                    openFullscreen(playerContainer);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    
+                    startRefreshTimer();
+                });
+            });
+            
+            // --- INICIALIZAÇÃO ---
+            checkSession();
+        });
+    </script>
+</body>
+</html>
